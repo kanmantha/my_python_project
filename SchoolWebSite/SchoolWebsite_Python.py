@@ -1,4 +1,4 @@
-# school_single_fixed.py
+# school_single_fixed_with_professional_css.py
 from flask import Flask, request, redirect, url_for, flash, send_file, render_template_string, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
@@ -100,23 +100,88 @@ base_tpl = """
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>School Portal (Single-file)</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-normalize/modern-normalize.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 20px auto; }
-    nav a { margin-right: 12px; }
-    table { border-collapse: collapse; width:100%; }
-    th,td { padding:8px; border:1px solid #ddd; text-align:left; }
-    .flash { padding:8px; margin-bottom:10px; border-radius:4px; }
-    .flash-success { background:#d4edda; color:#155724; }
-    .flash-danger { background:#f8d7da; color:#721c24; }
-    form p { margin:6px 0; }
-    header small { color:#666; display:block; margin-top:-6px; }
+    :root{
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --primary:#2563eb;
+      --accent:#06b6d4;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --border: rgba(15,23,42,0.06);
+      --radius:12px;
+      --max-width:1100px;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+
+    html,body{height:100%; background:var(--bg); margin:0;}
+    .container{max-width:var(--max-width); margin:28px auto; padding:22px;}
+
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    header h1{margin:0;font-size:1.4rem;letter-spacing:0.2px}
+    header small{display:block;color:var(--muted);font-size:0.85rem}
+
+    nav{display:flex;gap:8px;align-items:center}
+    nav a{display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;color:var(--muted);font-weight:600;font-size:0.95rem}
+    nav a:hover{background:rgba(15,23,42,0.03);color:var(--primary)}
+    .nav-cta{background:var(--primary);color:white;padding:8px 12px;border-radius:8px}
+
+    main{display:block}
+
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 6px 18px rgba(15,23,42,0.06);padding:18px;border:1px solid var(--border);margin-bottom:14px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .col-8{grid-column:span 8}
+    .col-4{grid-column:span 4}
+
+    table{width:100%;border-collapse:collapse;background:transparent}
+    thead th{background:transparent;text-align:left;padding:12px 10px;color:var(--muted);font-size:0.9rem}
+    tbody td{padding:12px 10px;border-top:1px solid var(--border);background:var(--card)}
+    tbody tr:hover td{background:linear-gradient(180deg, rgba(245,247,250,0.8), rgba(255,255,255,0.6))}
+
+    form p{margin:8px 0}
+    input[type="text"], input[type="password"], input[type="date"], textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;font-size:0.95rem}
+    textarea{min-height:110px}
+    button, .btn{display:inline-block;padding:10px 14px;border-radius:8px;border:0;background:var(--primary);color:white;font-weight:600;cursor:pointer}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+
+    .flash{padding:10px 14px;margin-bottom:12px;border-radius:10px;font-weight:600}
+    .flash-success{background:rgba(16,185,129,0.12);color:var(--success);border:1px solid rgba(16,185,129,0.12)}
+    .flash-danger{background:rgba(220,38,38,0.08);color:var(--danger);border:1px solid rgba(220,38,38,0.08)}
+    .flash-warning{background:rgba(245,158,11,0.08);color:#b45309;border:1px solid rgba(245,158,11,0.08)}
+
+    footer{margin-top:22px;text-align:center;color:var(--muted);font-size:0.9rem}
+
+    .small{font-size:0.9rem;color:var(--muted)}
+
+    /* Responsive */
+    @media (max-width:900px){
+      .grid{grid-template-columns:repeat(6,1fr)}
+      .col-8{grid-column:span 6}
+      .col-4{grid-column:span 6}
+      nav{flex-wrap:wrap}
+      header{gap:8px}
+    }
+
+    @media (max-width:520px){
+      .container{padding:12px;margin:12px}
+      header h1{font-size:1.1rem}
+      nav a{padding:7px 8px;font-size:0.85rem}
+    }
   </style>
 </head>
 <body>
+  <div class="container">
   <header>
-    <h1>School Portal</h1>
+    <div>
+      <h1>School Portal</h1>
+      <small>Simple, fast, and friendly</small>
+    </div>
     <nav>
       {% if current_user.is_authenticated %}
       <a href="{{ url_for('index') }}">Dashboard</a>
@@ -126,13 +191,13 @@ base_tpl = """
       <a href="{{ url_for('grades') }}">Grades</a>
       <a href="{{ url_for('report') }}">Reports</a>
       <a href="{{ url_for('export_students') }}">Export CSV</a>
-      <a href="{{ url_for('logout') }}">Logout</a>
+      <a class="nav-cta" href="{{ url_for('logout') }}">Logout</a>
       {% else %}
-      <a href="{{ url_for('login') }}">Login</a>
+      <a class="nav-cta" href="{{ url_for('login') }}">Login</a>
       {% endif %}
     </nav>
-    <hr>
   </header>
+
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, msg in messages %}
@@ -143,43 +208,61 @@ base_tpl = """
 
   {{ child_content|safe }}
 
-  <footer style="margin-top:20px; font-size:0.9em; color:#666;">
-    &copy; School Portal
+  <footer>
+    &copy; School Portal — built with ❤️
   </footer>
+  </div>
 </body>
 </html>
 """
 
 login_tpl = """
 {% block content %}
-  <h2>Login</h2>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.username.label }}<br>{{ form.username(size=32) }}</p>
-    <p>{{ form.password.label }}<br>{{ form.password(size=32) }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
+  <div class="card" style="max-width:480px;margin:0 auto">
+    <h2 style="margin-top:0">Login</h2>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <p>{{ form.username.label }}<br>{{ form.username(size=32) }}</p>
+      <p>{{ form.password.label }}<br>{{ form.password(size=32) }}</p>
+      <p>{{ form.submit(class_='btn') }}</p>
+    </form>
+  </div>
 {% endblock %}
 """
 
 index_tpl = """
 {% block content %}
-  <h2>Dashboard</h2>
-  <p>Total students: <strong>{{ total_students }}</strong></p>
-  <p>Present today ({{ today }}): <strong>{{ present_count }}</strong></p>
-  <p><a href="{{ url_for('students') }}">View all students</a></p>
+  <div class="grid">
+    <div class="col-8">
+      <div class="card">
+        <h2 style="margin-top:0">Dashboard</h2>
+        <p>Total students: <strong>{{ total_students }}</strong></p>
+        <p>Present today ({{ today }}): <strong>{{ present_count }}</strong></p>
+        <p><a class="btn btn-outline" href="{{ url_for('students') }}">View all students</a></p>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card small">
+        <h3 style="margin-top:0">Quick Actions</h3>
+        <p><a class="btn" href="{{ url_for('enroll') }}">Enroll Student</a></p>
+        <p><a class="btn btn-outline" href="{{ url_for('attendance') }}">Mark Attendance</a></p>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 """
 
 students_tpl = """
 {% block content %}
-  <h2>Students</h2>
-  <form method="get" style="margin-bottom:10px;">
-    <input type="text" name="q" placeholder="search name / roll" value="{{ q }}">
-    <button>Search</button>
-  </form>
-  <table>
-    <tr><th>Roll</th><th>Name</th><th>Class</th><th>Email</th><th>Actions</th></tr>
+  <div class="card">
+    <h2 style="margin-top:0">Students</h2>
+    <form method="get" style="margin-bottom:14px;display:flex;gap:8px">
+      <input type="text" name="q" placeholder="search name / roll" value="{{ q }}" style="flex:1">
+      <button class="btn">Search</button>
+    </form>
+    <table>
+      <thead><tr><th>Roll</th><th>Name</th><th>Class</th><th>Email</th><th>Actions</th></tr></thead>
+      <tbody>
     {% for s in students %}
       <tr>
         <td>{{ s.roll_no }}</td>
@@ -188,130 +271,167 @@ students_tpl = """
         <td>{{ s.email or "" }}</td>
         <td><a href="{{ url_for('view_student', student_id=s.id) }}">View</a></td>
       </tr>
-    {% else %}
+      {% else %}
       <tr><td colspan="5">No students found.</td></tr>
     {% endfor %}
-  </table>
+      </tbody>
+    </table>
+  </div>
 {% endblock %}
 """
 
 enroll_tpl = """
 {% block content %}
-  <h2>Enroll Student</h2>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.roll_no.label }}<br>{{ form.roll_no(size=24) }}</p>
-    <p>{{ form.name.label }}<br>{{ form.name(size=48) }}</p>
-    <p>{{ form.email.label }}<br>{{ form.email(size=48) }}</p>
-    <p>{{ form.class_name.label }}<br>{{ form.class_name(size=24) }}</p>
-    <p>{{ form.extra.label }}<br>{{ form.extra(rows=4, cols=60) }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
+  <div class="card" style="max-width:720px">
+    <h2 style="margin-top:0">Enroll Student</h2>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <p>{{ form.roll_no.label }}<br>{{ form.roll_no(size=24) }}</p>
+      <p>{{ form.name.label }}<br>{{ form.name(size=48) }}</p>
+      <p>{{ form.email.label }}<br>{{ form.email(size=48) }}</p>
+      <p>{{ form.class_name.label }}<br>{{ form.class_name(size=24) }}</p>
+      <p>{{ form.extra.label }}<br>{{ form.extra(rows=4, cols=60) }}</p>
+      <p>{{ form.submit(class_='btn') }}</p>
+    </form>
+  </div>
 {% endblock %}
 """
 
 attendance_tpl = """
 {% block content %}
-  <h2>Attendance for {{ selected_date }}</h2>
-  <form method="post">
-    <p>Date: <input type="date" name="date" value="{{ selected_date.isoformat() }}"></p>
-    <table>
-      <tr><th>Roll</th><th>Name</th><th>Status</th></tr>
-      {% for s in students %}
-      <tr>
-        <td>{{ s.roll_no }}</td>
-        <td>{{ s.name }}</td>
-        <td>
-          <select name="status_{{ s.id }}">
-            {% set st = existing.get(s.id) %}
-            <option value="Present" {% if st and st.status=='Present' %}selected{% endif %}>Present</option>
-            <option value="Absent" {% if st and st.status=='Absent' %}selected{% endif %}>Absent</option>
-            <option value="Leave" {% if st and st.status=='Leave' %}selected{% endif %}>Leave</option>
-          </select>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-    <p><button type="submit">Save Attendance</button></p>
-  </form>
+  <div class="card">
+    <h2 style="margin-top:0">Attendance for {{ selected_date }}</h2>
+    <form method="post">
+      <p>Date: <input type="date" name="date" value="{{ selected_date.isoformat() }}"></p>
+      <table>
+        <thead><tr><th>Roll</th><th>Name</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for s in students %}
+        <tr>
+          <td>{{ s.roll_no }}</td>
+          <td>{{ s.name }}</td>
+          <td>
+            <select name="status_{{ s.id }}">
+              {% set st = existing.get(s.id) %}
+              <option value="Present" {% if st and st.status=='Present' %}selected{% endif %}>Present</option>
+              <option value="Absent" {% if st and st.status=='Absent' %}selected{% endif %}>Absent</option>
+              <option value="Leave" {% if st and st.status=='Leave' %}selected{% endif %}>Leave</option>
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <p style="margin-top:12px"><button type="submit" class="btn">Save Attendance</button></p>
+    </form>
+  </div>
 {% endblock %}
 """
 
 grades_tpl = """
 {% block content %}
-  <h2>Grades</h2>
-  <h3>Add Grade</h3>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.student_id.label }}<br>{{ form.student_id() }}</p>
-    <p>{{ form.subject.label }}<br>{{ form.subject(size=40) }}</p>
-    <p>{{ form.marks.label }}<br>{{ form.marks() }}</p>
-    <p>{{ form.max_marks.label }}<br>{{ form.max_marks() }}</p>
-    <p>{{ form.term.label }}<br>{{ form.term(size=30) }}</p>
-    <p>{{ form.remarks.label }}<br>{{ form.remarks(rows=2, cols=60) }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
-
-  <h3>Recent Grades</h3>
-  <table>
-    <tr><th>Student</th><th>Subject</th><th>Marks</th><th>Term</th><th>Remarks</th></tr>
-    {% for g in grades %}
-      <tr>
-        <td>{{ g.student.roll_no }} - {{ g.student.name }}</td>
-        <td>{{ g.subject }}</td>
-        <td>{{ g.marks }} / {{ g.max_marks }}</td>
-        <td>{{ g.term }}</td>
-        <td>{{ g.remarks or "" }}</td>
-      </tr>
-    {% else %}
-      <tr><td colspan="5">No grades yet.</td></tr>
-    {% endfor %}
-  </table>
+  <div class="grid">
+    <div class="col-4">
+      <div class="card">
+        <h3 style="margin-top:0">Add Grade</h3>
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <p>{{ form.student_id.label }}<br>{{ form.student_id() }}</p>
+          <p>{{ form.subject.label }}<br>{{ form.subject(size=40) }}</p>
+          <p>{{ form.marks.label }}<br>{{ form.marks() }}</p>
+          <p>{{ form.max_marks.label }}<br>{{ form.max_marks() }}</p>
+          <p>{{ form.term.label }}<br>{{ form.term(size=30) }}</p>
+          <p>{{ form.remarks.label }}<br>{{ form.remarks(rows=2, cols=60) }}</p>
+          <p>{{ form.submit(class_='btn') }}</p>
+        </form>
+      </div>
+    </div>
+    <div class="col-8">
+      <div class="card">
+        <h3 style="margin-top:0">Recent Grades</h3>
+        <table>
+          <thead><tr><th>Student</th><th>Subject</th><th>Marks</th><th>Term</th><th>Remarks</th></tr></thead>
+          <tbody>
+          {% for g in grades %}
+            <tr>
+              <td>{{ g.student.roll_no }} - {{ g.student.name }}</td>
+              <td>{{ g.subject }}</td>
+              <td>{{ g.marks }} / {{ g.max_marks }}</td>
+              <td>{{ g.term }}</td>
+              <td>{{ g.remarks or "" }}</td>
+            </tr>
+          {% else %}
+            <tr><td colspan="5">No grades yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 """
 
 view_student_tpl = """
 {% block content %}
-  <h2>Student: {{ s.roll_no }} - {{ s.name }}</h2>
-  <p><strong>Class:</strong> {{ s.class_name or "" }} &nbsp; <strong>Email:</strong> {{ s.email or "" }}</p>
-  <p><strong>Notes:</strong> {{ s.extra or "—" }}</p>
+  <div class="card">
+    <h2 style="margin-top:0">Student: {{ s.roll_no }} - {{ s.name }}</h2>
+    <p><strong>Class:</strong> {{ s.class_name or "" }} &nbsp; <strong>Email:</strong> {{ s.email or "" }}</p>
+    <p><strong>Notes:</strong> {{ s.extra or "—" }}</p>
+  </div>
 
-  <h3>Attendance (last 30)</h3>
-  <table>
-    <tr><th>Date</th><th>Status</th></tr>
-    {% for a in attendances %}
-      <tr><td>{{ a.date }}</td><td>{{ a.status }}</td></tr>
-    {% else %}
-      <tr><td colspan="2">No attendance records.</td></tr>
-    {% endfor %}
-  </table>
-
-  <h3>Grades (last 30)</h3>
-  <table>
-    <tr><th>Subject</th><th>Marks</th><th>Term</th><th>Remarks</th></tr>
-    {% for g in grades %}
-      <tr><td>{{ g.subject }}</td><td>{{ g.marks }} / {{ g.max_marks }}</td><td>{{ g.term }}</td><td>{{ g.remarks or "" }}</td></tr>
-    {% else %}
-      <tr><td colspan="4">No grades recorded.</td></tr>
-    {% endfor %}
-  </table>
+  <div class="grid">
+    <div class="col-6">
+      <div class="card">
+        <h3 style="margin-top:0">Attendance (last 30)</h3>
+        <table>
+          <thead><tr><th>Date</th><th>Status</th></tr></thead>
+          <tbody>
+          {% for a in attendances %}
+            <tr><td>{{ a.date }}</td><td>{{ a.status }}</td></tr>
+          {% else %}
+            <tr><td colspan="2">No attendance records.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card">
+        <h3 style="margin-top:0">Grades (last 30)</h3>
+        <table>
+          <thead><tr><th>Subject</th><th>Marks</th><th>Term</th><th>Remarks</th></tr></thead>
+          <tbody>
+          {% for g in grades %}
+            <tr><td>{{ g.subject }}</td><td>{{ g.marks }} / {{ g.max_marks }}</td><td>{{ g.term }}</td><td>{{ g.remarks or "" }}</td></tr>
+          {% else %}
+            <tr><td colspan="4">No grades recorded.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 """
 
 report_tpl = """
 {% block content %}
-  <h2>Attendance Report (last 7 days)</h2>
-  <table>
-    <tr><th>Date</th><th>Present</th><th>Total Students</th><th>% Present</th></tr>
-    {% for row in summary %}
-      <tr>
-        <td>{{ row.date }}</td>
-        <td>{{ row.present }}</td>
-        <td>{{ row.total }}</td>
-        <td>{{ "%.1f"|format((row.present / (row.total or 1))*100) }}%</td>
-      </tr>
-    {% endfor %}
-  </table>
+  <div class="card">
+    <h2 style="margin-top:0">Attendance Report (last 7 days)</h2>
+    <table>
+      <thead><tr><th>Date</th><th>Present</th><th>Total Students</th><th>% Present</th></tr></thead>
+      <tbody>
+      {% for row in summary %}
+        <tr>
+          <td>{{ row.date }}</td>
+          <td>{{ row.present }}</td>
+          <td>{{ row.total }}</td>
+          <td>{{ "%.1f"|format((row.present / (row.total or 1))*100) }}%</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
 {% endblock %}
 """
 
